@@ -30,7 +30,6 @@ axios.defaults.adapter = async (config) => {
   const result = handler ? await handler(config) : { status: 404, data: {} };
   const response = { ...result, config, headers: {}, data: result.data ?? {} };
   if (result.status >= 200 && result.status < 300) return response;
-  // eslint-disable-next-line prefer-promise-reject-errors
   return Promise.reject(Object.assign(new Error(`Request failed with status ${result.status}`), {
     response, config, isAxiosError: true, request: {},
   }));

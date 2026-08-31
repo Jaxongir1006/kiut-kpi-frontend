@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	Plus, Search, Pencil, Trash2, Loader2, Users,
@@ -71,9 +71,18 @@ export default function UsersPage() {
 
 	useEffect(() => {
 		dispatch(fetchUsers());
-		if (!roles.length)       dispatch(fetchRoles());
-		if (!departments.length) dispatch(fetchDepartments());
 	}, [dispatch]);
+
+	// Split out so each effect can declare the cache check it actually reads.
+	// Idempotent: once the list is non-empty the guard stops the refetch, and
+	// the dep only changes when the count changes.
+	useEffect(() => {
+		if (!roles.length) dispatch(fetchRoles());
+	}, [dispatch, roles.length]);
+
+	useEffect(() => {
+		if (!departments.length) dispatch(fetchDepartments());
+	}, [dispatch, departments.length]);
 
 	const autoPassword = form.username ? `${form.username}@2026_kiut` : "";
 

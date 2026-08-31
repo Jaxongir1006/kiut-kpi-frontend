@@ -3,7 +3,7 @@ import { Provider, useDispatch, useSelector } from 'react-redux';
 import { store } from '@/app/store';
 import { Toaster } from "@/components/ui/toaster";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { LanguageProvider } from '@/context/LanguageContext';
+import { LanguageProvider } from '@/context/LanguageProvider';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
 import RequireSystemAdmin from './components/RequireSystemAdmin';
@@ -53,11 +53,17 @@ function AppRoutes() {
   const { accessToken, isFetchingMe, isAuthenticated, user } = useSelector((state) => state.auth);
   const isTeacher = isTeacherRole(user);
 
+  // Guarded on `!user`, which is what makes the dependency array honest without
+  // changing behaviour. SIMPLE_JWT runs with ROTATE_REFRESH_TOKENS, so
+  // `accessToken` changes on every silent refresh; depending on it with no guard
+  // would fire a /me request per rotation. Once /me has answered, `user` is set
+  // and a rotation re-runs this effect to do nothing. On a rejected /me the
+  // slice clears the token, so there is no loop either.
   useEffect(() => {
-    if (accessToken) {
+    if (accessToken && !user) {
       dispatch(fetchMeThunk());
     }
-  }, []);
+  }, [accessToken, user, dispatch]);
 
   // A token exists but /me has not answered yet: the role is UNKNOWN, not
   // "not a teacher". Rendering the tree here gave a teacher the admin shell for

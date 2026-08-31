@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Plus, Search, Filter, X, Pencil, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";

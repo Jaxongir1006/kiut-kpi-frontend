@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   MessageSquare, Clock, CheckCircle2, XCircle,
-  ChevronDown, ChevronUp, Loader2, Search, Filter,
+  ChevronDown, ChevronUp, Loader2, Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,15 +62,6 @@ function ReviewDialog({ appeal, open, onClose }) {
   const [reviewComments, setReviewComments]   = useState("");
   const [submissionStatus, setSubmissionStatus] = useState("");
   const [pointsOverride, setPointsOverride]   = useState("");
-
-  useEffect(() => {
-    if (open) {
-      setStatus("resolved");
-      setReviewComments("");
-      setSubmissionStatus("");
-      setPointsOverride("");
-    }
-  }, [open]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -402,11 +393,14 @@ export default function AdminAppeals() {
         </div>
       )}
 
-      <ReviewDialog
-        appeal={reviewing}
-        open={!!reviewing}
-        onClose={() => setReviewing(null)}
-      />
+      {reviewing && (
+        <ReviewDialog
+          key={reviewing.id}
+          appeal={reviewing}
+          open
+          onClose={() => setReviewing(null)}
+        />
+      )}
     </div>
   );
 }

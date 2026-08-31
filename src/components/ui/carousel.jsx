@@ -34,17 +34,32 @@ const Carousel = React.forwardRef((
     ...opts,
     axis: orientation === "horizontal" ? "x" : "y",
   }, plugins)
-  const [canScrollPrev, setCanScrollPrev] = React.useState(false)
-  const [canScrollNext, setCanScrollNext] = React.useState(false)
-
-  const onSelect = React.useCallback((api) => {
+  // embla is an external store; subscribe to it rather than mirroring its
+  // state into React state from inside an effect.
+  const subscribe = React.useCallback((onStoreChange) => {
     if (!api) {
-      return
+      return () => {}
     }
 
-    setCanScrollPrev(api.canScrollPrev())
-    setCanScrollNext(api.canScrollNext())
-  }, [])
+    api.on("reInit", onStoreChange)
+    api.on("select", onStoreChange)
+
+    return () => {
+      api.off("reInit", onStoreChange)
+      api.off("select", onStoreChange)
+    };
+  }, [api])
+
+  const canScrollPrev = React.useSyncExternalStore(
+    subscribe,
+    () => (api ? api.canScrollPrev() : false),
+    () => false
+  )
+  const canScrollNext = React.useSyncExternalStore(
+    subscribe,
+    () => (api ? api.canScrollNext() : false),
+    () => false
+  )
 
   const scrollPrev = React.useCallback(() => {
     api?.scrollPrev()
@@ -71,20 +86,6 @@ const Carousel = React.forwardRef((
 
     setApi(api)
   }, [api, setApi])
-
-  React.useEffect(() => {
-    if (!api) {
-      return
-    }
-
-    onSelect(api)
-    api.on("reInit", onSelect)
-    api.on("select", onSelect)
-
-    return () => {
-      api?.off("select", onSelect)
-    };
-  }, [api, onSelect])
 
   return (
     <CarouselContext.Provider

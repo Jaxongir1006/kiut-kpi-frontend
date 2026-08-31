@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -13,7 +13,7 @@ import { Download, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { toast } from "sonner";
 import axiosInstance from "@/api/axiosInstance";
-import { fetchLeaderboard, fetchSummaries } from "@/features/scoring/scoringSlice";
+import { fetchSummaries } from "@/features/scoring/scoringSlice";
 import { fetchYears } from "@/features/academicYears/academicYearsSlice";
 import { fetchSubmissions } from "@/features/submissions/submissionsSlice";
 import { fetchTeachers } from "@/features/teachers/teachersSlice";
@@ -102,16 +102,24 @@ export default function Dashboard() {
 	const { t } = useLanguage();
 	const dispatch = useDispatch();
 
-	const { leaderboard, summaries, isLeaderboardLoading } = useSelector((s) => s.scoring);
+	// `topPerformers` below is derived from `summaries`, so the summaries request
+	// is what the panel is actually waiting on. It previously spun on
+	// isLeaderboardLoading while a whole second request -- /summaries/leaderboard/
+	// -- was fetched on every year change and its response thrown away.
+	const { summaries, isLoading: isScoringLoading } = useSelector((s) => s.scoring);
 	const { list: submissions, isLoading: isSubsLoading }  = useSelector((s) => s.submissions);
 	const { list: years }    = useSelector((s) => s.academicYears);
 	const { list: teachers } = useSelector((s) => s.teachers);
 	const { list: users }    = useSelector((s) => s.users);
 
-	const [selectedYear, setSelectedYear]       = useState("");
+	// null = not picked yet -> fall back to the active year (derived, not an effect).
+	const [yearChoice, setYearChoice]           = useState(null);
 	const [deptMetric, setDeptMetric]           = useState("total");
 	const [activityFilter, setActivityFilter]   = useState("all");
 	const [isExporting, setIsExporting]         = useState(false);
+
+	const defaultYearId = years.find((y) => y.is_active)?.id || years[0]?.id || "";
+	const selectedYear = yearChoice ?? defaultYearId;
 
 	useEffect(() => {
 		dispatch(fetchYears());
@@ -121,15 +129,7 @@ export default function Dashboard() {
 	}, [dispatch]);
 
 	useEffect(() => {
-		if (years.length && !selectedYear) {
-			const active = years.find((y) => y.is_active);
-			setSelectedYear(active?.id || years[0]?.id || "");
-		}
-	}, [years, selectedYear]);
-
-	useEffect(() => {
 		if (selectedYear) {
-			dispatch(fetchLeaderboard(selectedYear));
 			dispatch(fetchSummaries(selectedYear));
 		}
 	}, [dispatch, selectedYear]);
@@ -265,7 +265,7 @@ export default function Dashboard() {
 						{isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
 						Excel
 					</Button>
-					<Select value={selectedYear} onValueChange={setSelectedYear}>
+					<Select value={selectedYear} onValueChange={setYearChoice}>
 						<SelectTrigger className="w-36 h-9">
 							<SelectValue placeholder="O'quv yili" />
 						</SelectTrigger>
@@ -290,7 +290,7 @@ export default function Dashboard() {
 						</Badge>
 					</div>
 
-					{isLeaderboardLoading ? (
+					{isScoringLoading ? (
 						<div className="flex-1 flex items-center justify-center">
 							<Loader2 className="w-6 h-6 animate-spin text-primary" />
 						</div>

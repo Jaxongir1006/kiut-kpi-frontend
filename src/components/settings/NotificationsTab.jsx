@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -11,7 +11,7 @@ export default function NotificationsTab() {
 	const [deadlineReminder, setDeadlineReminder] = useState(true);
 	const [approvalNotify, setApprovalNotify] = useState(true);
 	const [warningNotify, setWarningNotify] = useState(true);
-	const [deadlineDays, setDeadlineDays] = useState("7");
+	const [deadlineDays] = useState("7");
 
 	const savePrefs = () => {
 		localStorage.setItem("notif_deadline", deadlineReminder);

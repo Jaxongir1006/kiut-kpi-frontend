@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -161,7 +161,7 @@ export default function TeacherSettings() {
 									<p className="text-sm font-medium">{label}</p>
 									<p className="text-xs text-muted-foreground">{sub}</p>
 								</div>
-								<Toggle checked={notifs[key]} onChange={(v) => toggleNotif(key)} />
+								<Toggle checked={notifs[key]} onChange={() => toggleNotif(key)} />
 							</div>
 						))}
 					</div>

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from "react";
+import {useState, useEffect, useMemo} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useLocation, useNavigate} from "react-router-dom";
 import {
@@ -74,20 +74,21 @@ export default function TeacherKpiResults() {
 	const {list: types} = useSelector((s) => s.types);
 	const {list: years} = useSelector((s) => s.academicYears);
 	const {list: departments} = useSelector((s) => s.departments);
-	const {list: teachers} = useSelector((s) => s.teachers);
 
 	const [search, setSearch] = useState("");
 	const [yearFilter, setYearFilter] = useState("all");
 	const [statusFilter, setStatus] = useState("all");
 	const [typeFilter, setTypeFilter] = useState("all");
 	const [page, setPage] = useState(1);
-	const [showForm, setShowForm] = useState(false);
+	const [formOpen, setFormOpen] = useState(false);
 	const [editItem, setEditItem] = useState(null);
 	const [showDetail, setShowDetail] = useState(null);
 	const [deleteId, setDeleteId] = useState(null);
 	const [isCoauthor, setIsCoauthor] = useState(false);
 	const [selectedType, setSelectedType] = useState("");
-	const [selectedYear, setSelectedYear] = useState("");
+	// null = "use the default (active) year". "" is a distinct, explicit value
+	// set by openEdit for a submission that carries no academic year.
+	const [yearChoice, setYearChoice] = useState(null);
 
 	// Derive teacher ID and department from teacherProfile or user
 	const teacherId = teacherProfile?.id || null;
@@ -107,11 +108,6 @@ export default function TeacherKpiResults() {
 		}
 		return "—";
 	}, [teacherProfile, myDeptId, departments]);
-
-	// Auto-open form if navigated to /my-kpi/new
-	useEffect(() => {
-		if (location.pathname.endsWith("/new")) openCreate();
-	}, [location.pathname]);
 
 	useEffect(() => {
 		dispatch(fetchSubmissions());
@@ -148,6 +144,14 @@ export default function TeacherKpiResults() {
 		});
 	}, [mySubmissions, search, yearFilter, statusFilter, typeFilter]);
 
+	// The /my-kpi/new route *is* the "create form is open" state, so it is
+	// derived during render rather than pushed into state from an effect.
+	const isNewRoute = location.pathname.endsWith("/new");
+	const showForm = formOpen || isNewRoute;
+
+	const defaultYearId = years.find((y) => y.is_active)?.id || years[0]?.id || "";
+	const selectedYear = yearChoice ?? defaultYearId;
+
 	const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 	const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -155,26 +159,24 @@ export default function TeacherKpiResults() {
 		setEditItem(null);
 		setIsCoauthor(false);
 		setSelectedType("");
-		// Pre-select active year
-		const active = years.find((y) => y.is_active);
-		setSelectedYear(active?.id || years[0]?.id || "");
-		setShowForm(true);
+		setYearChoice(null); // fall back to the active year
+		setFormOpen(true);
 	};
 
 	const openEdit = (item) => {
 		setEditItem(item);
 		setIsCoauthor((item.co_authors_count ?? 1) > 1);
 		setSelectedType(item.activity_type || "");
-		setSelectedYear(item.academic_year || "");
-		setShowForm(true);
+		setYearChoice(item.academic_year || "");
+		setFormOpen(true);
 	};
 
 	const closeForm = () => {
-		setShowForm(false);
+		setFormOpen(false);
 		setEditItem(null);
 		setIsCoauthor(false);
 		setSelectedType("");
-		setSelectedYear("");
+		setYearChoice(null);
 		if (location.pathname.endsWith("/new")) navigate("/my-kpi", {replace: true});
 	};
 
@@ -484,7 +486,7 @@ export default function TeacherKpiResults() {
 								<Label>Akademik yil *</Label>
 								<SearchableSelect
 									value={selectedYear}
-									onValueChange={setSelectedYear}
+									onValueChange={setYearChoice}
 									placeholder="Yil"
 									options={years.map((y) => ({value: y.id, label: y.name}))}
 								/>

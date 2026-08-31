@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { cn } from "@/lib/utils";
@@ -11,20 +11,18 @@ export default function TeacherLayout() {
 	const dispatch = useDispatch();
 	const [collapsed, setCollapsed] = useState(false);
 	const [mobileOpen, setMobileOpen] = useState(false);
-	const [selectedYear, setSelectedYear] = useState("");
+	// null = the user has not picked a year yet, so fall back to the active one.
+	// Derived during render instead of via an effect that mirrors `years`.
+	const [yearChoice, setYearChoice] = useState(null);
 
 	const { list: years } = useSelector((s) => s.academicYears);
+
+	const defaultYearId = years.find((y) => y.is_active)?.id || years[0]?.id || "";
+	const selectedYear = yearChoice ?? defaultYearId;
 
 	useEffect(() => {
 		dispatch(fetchYears());
 	}, [dispatch]);
-
-	useEffect(() => {
-		if (years.length && !selectedYear) {
-			const active = years.find((y) => y.is_active);
-			setSelectedYear(active?.id || years[0]?.id || "");
-		}
-	}, [years, selectedYear]);
 
 	return (
 		<div className="min-h-screen bg-background">
@@ -49,7 +47,7 @@ export default function TeacherLayout() {
 				<TeacherTopBar
 					onMobileMenu={() => setMobileOpen(true)}
 					selectedYear={selectedYear}
-					onYearChange={setSelectedYear}
+					onYearChange={setYearChoice}
 				/>
 				<main className="p-4 md:p-6 lg:p-8">
 					<Outlet context={{ selectedYear }} />

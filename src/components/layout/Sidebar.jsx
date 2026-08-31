@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
 	LayoutDashboard, Users, FileText, Award, Settings,
@@ -59,10 +58,6 @@ export default function Sidebar({ collapsed, onToggle }) {
 	const roleLabel = isTeacher
 		? (teacherProfile?.position || user?.position || "Professor-o'qituvchi")
 		: "Administrator";
-
-	const deptLabel = isTeacher
-		? (teacherProfile?.department_name || teacherProfile?.department_details?.name || "")
-		: "";
 
 	return (
 		<aside className={cn(

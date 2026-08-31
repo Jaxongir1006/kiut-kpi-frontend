@@ -1,4 +1,3 @@
-import React from "react";
 import { Bell, Search, Menu, Globe, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";

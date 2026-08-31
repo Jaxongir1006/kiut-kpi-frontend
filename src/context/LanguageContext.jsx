@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext } from "react";
 
 const translations = {
 	uz: {
@@ -25,11 +25,7 @@ const translations = {
 		settings: "Sozlamalar",
 
 		// Common
-		add: "Qo'shish",
 		edit: "Tahrirlash",
-		save: "Saqlash",
-		cancel: "Bekor qilish",
-		delete: "O'chirish",
 		confirm: "Tasdiqlash",
 		send: "Yuborish",
 		search: "Qidirish...",
@@ -41,7 +37,6 @@ const translations = {
 		actions: "Amal",
 		select: "Tanlang",
 		loading: "Yuklanmoqda...",
-		no_data: "Ma'lumot topilmadi",
 		data_not_found: "Ma'lumot mavjud emas",
 		filter: "Filter",
 		view: "Ko'rish",
@@ -56,8 +51,6 @@ const translations = {
 		approved: "Tasdiqlangan",
 		rejected: "Rad etilgan",
 		archived: "Arxivlangan",
-		active: "Faol",
-		inactive: "Nofaol",
 		pending: "Kutilayotgan",
 		reviewed: "Tekshirilgan",
 
@@ -98,7 +91,6 @@ const translations = {
 		edit_activity: "Faoliyatni tahrirlash",
 		activity_details: "Faoliyat tafsilotlari",
 		title: "Sarlavha",
-		description: "Tavsif",
 		category: "Kategoriya",
 		date: "Sana",
 		academic_year: "O'quv yili",
@@ -118,8 +110,6 @@ const translations = {
 		no_activities: "Faoliyatlar topilmadi",
 		no_activities_desc: "Yangi faoliyat qo'shing",
 		teacher: "O'qituvchi",
-		base_score: "Asosiy ball",
-		multiplier: "Koeffitsient",
 		final_score: "Yakuniy ball",
 		reviewer_comment: "Tekshiruvchi izohi",
 		submitted_by_teacher: "O'qituvchi tomonidan yuborildi",
@@ -216,12 +206,8 @@ const translations = {
 		categories_title: "Kategoriyalar",
 		categories_desc: "Ball berish kategoriyalari",
 		new_category: "Yangi kategoriya",
-		edit_category: "Tahrirlash",
-		group: "Guruh",
 		group_req: "Guruh *",
 		multiplier_field: "Ko'paytiruvchi",
-		max_score: "Maks. ball",
-		is_penalty: "Bu jarima (minus ball)",
 		penalty_yes: "Ha",
 		cat_added: "Kategoriya qo'shildi",
 		cat_updated: "Kategoriya yangilandi",
@@ -244,7 +230,6 @@ const translations = {
 		degrees_desc: "Kataloglarni boshqarish",
 		new_degree: "Yangi daraja",
 		new_rank: "Yangi unvon",
-		abbreviation: "Qisqartmasi",
 		degrees_tab: "Ilmiy darajalar",
 		ranks_tab: "Ilmiy unvonlar",
 		item_added: "Qo'shildi",
@@ -256,9 +241,6 @@ const translations = {
 		years_desc: "O'quv yillarini boshqarish",
 		years_purpose: "O'quv yillari faoliyatlarni davrlar bo'yicha guruhlash uchun ishlatiladi. Har bir faoliyat ma'lum bir o'quv yiliga biriktiriladi.",
 		new_year: "Yangi o'quv yili",
-		edit_year: "Tahrirlash",
-		start_date: "Boshlanish sanasi",
-		end_date: "Tugash sanasi",
 		state: "Holat",
 		active_state: "Faol",
 		inactive_state: "Nofaol",
@@ -266,7 +248,6 @@ const translations = {
 		year_added: "O'quv yili qo'shildi",
 		year_updated: "O'quv yili yangilandi",
 		year_deleted: "O'quv yili o'chirildi",
-		no_years: "O'quv yillari topilmadi",
 		start_label: "Boshlanish",
 		end_label: "Tugash",
 
@@ -287,7 +268,6 @@ const translations = {
 		rating_title: "Reyting",
 		rating_desc: "O'qituvchilar reytingi",
 		rank_label: "O'rin",
-		points: "ball",
 
 		// Public Rating
 		public_rating_title: "Universitet Reytingi",
@@ -465,11 +445,7 @@ const translations = {
 		public_rating: "Публичный рейтинг",
 		settings: "Настройки",
 
-		add: "Добавить",
 		edit: "Редактировать",
-		save: "Сохранить",
-		cancel: "Отмена",
-		delete: "Удалить",
 		confirm: "Подтвердить",
 		send: "Отправить",
 		search: "Поиск...",
@@ -481,11 +457,9 @@ const translations = {
 		actions: "Действие",
 		select: "Выбрать",
 		loading: "Загрузка...",
-		no_data: "Данные не найдены",
 		data_not_found: "Данные отсутствуют",
 		filter: "Фильтр",
 		view: "Просмотр",
-		back: "Назад",
 
 		all_statuses: "Все",
 		draft: "Черновик",
@@ -495,8 +469,6 @@ const translations = {
 		approved: "Одобрено",
 		rejected: "Отклонено",
 		archived: "Архивировано",
-		active: "Активный",
-		inactive: "Неактивный",
 		pending: "Ожидающие",
 		reviewed: "Проверенные",
 
@@ -535,7 +507,6 @@ const translations = {
 		edit_activity: "Редактировать",
 		activity_details: "Детали деятельности",
 		title: "Заголовок",
-		description: "Описание",
 		category: "Категория",
 		date: "Дата",
 		academic_year: "Учебный год",
@@ -555,8 +526,6 @@ const translations = {
 		no_activities: "Деятельность не найдена",
 		no_activities_desc: "Добавьте новую деятельность",
 		teacher: "Преподаватель",
-		base_score: "Базовый балл",
-		multiplier: "Коэффициент",
 		final_score: "Итоговый балл",
 		reviewer_comment: "Комментарий проверяющего",
 		submitted_by_teacher: "Отправлено преподавателем",
@@ -647,12 +616,8 @@ const translations = {
 		categories_title: "Категории",
 		categories_desc: "Категории начисления баллов",
 		new_category: "Новая категория",
-		edit_category: "Редактировать",
-		group: "Группа",
 		group_req: "Группа *",
 		multiplier_field: "Множитель",
-		max_score: "Макс. балл",
-		is_penalty: "Это штраф (минус балл)",
 		penalty_yes: "Да",
 		cat_added: "Категория добавлена",
 		cat_updated: "Категория обновлена",
@@ -674,7 +639,6 @@ const translations = {
 		degrees_desc: "Управление каталогами",
 		new_degree: "Новая степень",
 		new_rank: "Новое звание",
-		abbreviation: "Аббревиатура",
 		degrees_tab: "Ученые степени",
 		ranks_tab: "Ученые звания",
 		item_added: "Добавлено",
@@ -685,9 +649,6 @@ const translations = {
 		years_desc: "Управление учебными годами",
 		years_purpose: "Учебные годы используются для группировки деятельности по периодам. Каждая деятельность привязывается к конкретному учебному году.",
 		new_year: "Новый учебный год",
-		edit_year: "Редактировать",
-		start_date: "Дата начала",
-		end_date: "Дата окончания",
 		state: "Статус",
 		active_state: "Активный",
 		inactive_state: "Неактивный",
@@ -695,7 +656,6 @@ const translations = {
 		year_added: "Учебный год добавлен",
 		year_updated: "Учебный год обновлен",
 		year_deleted: "Учебный год удален",
-		no_years: "Учебные годы не найдены",
 		start_label: "Начало",
 		end_label: "Окончание",
 
@@ -714,7 +674,6 @@ const translations = {
 		rating_title: "Рейтинг",
 		rating_desc: "Рейтинг преподавателей",
 		rank_label: "Место",
-		points: "балл.",
 
 		public_rating_title: "Рейтинг Университета",
 		public_rating_desc: "Рейтинг научной деятельности преподавателей",
@@ -890,11 +849,7 @@ const translations = {
 		public_rating: "Public Rating",
 		settings: "Settings",
 
-		add: "Add",
 		edit: "Edit",
-		save: "Save",
-		cancel: "Cancel",
-		delete: "Delete",
 		confirm: "Confirm",
 		send: "Submit",
 		search: "Search...",
@@ -906,11 +861,9 @@ const translations = {
 		actions: "Action",
 		select: "Select",
 		loading: "Loading...",
-		no_data: "No data found",
 		data_not_found: "No data available",
 		filter: "Filter",
 		view: "View",
-		back: "Back",
 
 		all_statuses: "All",
 		draft: "Draft",
@@ -920,8 +873,6 @@ const translations = {
 		approved: "Approved",
 		rejected: "Rejected",
 		archived: "Archived",
-		active: "Active",
-		inactive: "Inactive",
 		pending: "Pending",
 		reviewed: "Reviewed",
 
@@ -960,7 +911,6 @@ const translations = {
 		edit_activity: "Edit Activity",
 		activity_details: "Activity Details",
 		title: "Title",
-		description: "Description",
 		category: "Category",
 		date: "Date",
 		academic_year: "Academic Year",
@@ -980,8 +930,6 @@ const translations = {
 		no_activities: "No activities found",
 		no_activities_desc: "Add a new activity",
 		teacher: "Teacher",
-		base_score: "Base Score",
-		multiplier: "Multiplier",
 		final_score: "Final Score",
 		reviewer_comment: "Reviewer Comment",
 		submitted_by_teacher: "Submitted by teacher",
@@ -1072,12 +1020,8 @@ const translations = {
 		categories_title: "Categories",
 		categories_desc: "Scoring categories",
 		new_category: "New Category",
-		edit_category: "Edit",
-		group: "Group",
 		group_req: "Group *",
 		multiplier_field: "Multiplier",
-		max_score: "Max Score",
-		is_penalty: "This is a penalty (minus points)",
 		penalty_yes: "Yes",
 		cat_added: "Category added",
 		cat_updated: "Category updated",
@@ -1099,7 +1043,6 @@ const translations = {
 		degrees_desc: "Manage catalogs",
 		new_degree: "New Degree",
 		new_rank: "New Rank",
-		abbreviation: "Abbreviation",
 		degrees_tab: "Academic Degrees",
 		ranks_tab: "Academic Ranks",
 		item_added: "Added",
@@ -1110,9 +1053,6 @@ const translations = {
 		years_desc: "Manage academic years",
 		years_purpose: "Academic years are used to group activities by periods. Each activity is linked to a specific academic year.",
 		new_year: "New Academic Year",
-		edit_year: "Edit",
-		start_date: "Start Date",
-		end_date: "End Date",
 		state: "Status",
 		active_state: "Active",
 		inactive_state: "Inactive",
@@ -1120,7 +1060,6 @@ const translations = {
 		year_added: "Academic year added",
 		year_updated: "Academic year updated",
 		year_deleted: "Academic year deleted",
-		no_years: "No academic years found",
 		start_label: "Start",
 		end_label: "End",
 
@@ -1139,7 +1078,6 @@ const translations = {
 		rating_title: "Rating",
 		rating_desc: "Teacher Rating",
 		rank_label: "Rank",
-		points: "pts",
 
 		public_rating_title: "University Rating",
 		public_rating_desc: "Teacher Scientific Activity Rating",
@@ -1295,28 +1233,7 @@ const translations = {
 	},
 };
 
-const LanguageContext = createContext();
-
-export function LanguageProvider({ children }) {
-	const [lang, setLang] = useState(() => localStorage.getItem("app_lang") || "uz");
-
-	const t = useCallback((key, ...args) => {
-		let text = (translations[lang] && translations[lang][key]) || translations.uz[key] || key;
-		if (args.length > 0 && typeof text === 'string') args.forEach((arg, i) => { text = text.replace(`{${i}}`, String(arg)); });
-		return text;
-	}, [lang]);
-
-	const changeLanguage = (newLang) => {
-		setLang(newLang);
-		localStorage.setItem("app_lang", newLang);
-	};
-
-	return (
-		<LanguageContext.Provider value={{ lang, t, changeLanguage }}>
-			{children}
-		</LanguageContext.Provider>
-	);
-}
+export const LanguageContext = createContext();
 
 export function useLanguage() {
 	const context = useContext(LanguageContext);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/context/LanguageContext";
 import { Briefcase, Plus, Pencil, Trash2, Check } from "lucide-react";
-import { toast } from "sonner";
 
 export default function TeacherTypesTab() {
 	const { t } = useLanguage();
@@ -17,7 +16,7 @@ export default function TeacherTypesTab() {
 	const [desc, setDesc] = useState("");
 	const [deleteTarget, setDeleteTarget] = useState(null);
 
-	const [types, setTypes] = useState([]);
+	const [types] = useState([]);
 
 	const saveMutation = { mutate: () => {} };
 	const deleteMutation = { mutate: () => {} };

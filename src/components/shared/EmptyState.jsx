@@ -1,4 +1,3 @@
-import React from "react";
 import { FolderOpen } from "lucide-react";
 
 export default function EmptyState({ title = "Ma'lumot topilmadi", description, icon: Icon = FolderOpen }) {

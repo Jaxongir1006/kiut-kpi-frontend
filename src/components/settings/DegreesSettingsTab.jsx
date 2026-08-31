@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { fetchDegrees, createDegree, updateDegree, deleteDegree } from "@/features/degrees/degreesSlice";
 import { fetchTitles, createTitle, updateTitle, deleteTitle } from "@/features/titles/titlesSlice";
 
-function CatalogPanel({ icon, heading, items, isLoading, isSaving, isDeleting, onAdd, onEdit, onDelete }) {
+function CatalogPanel({ icon, heading, items, isLoading, onAdd, onEdit, onDelete }) {
 	return (
 		<div className="bg-muted/30 border border-border rounded-lg p-4">
 			<div className="flex items-center justify-between mb-3">

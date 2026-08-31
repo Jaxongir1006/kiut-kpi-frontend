@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
 	BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-	ResponsiveContainer, PieChart, Pie, Cell,
+	ResponsiveContainer, Cell,
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -128,23 +128,20 @@ export default function TeacherDashboard() {
 
 	const { list: submissions, isLoading } = useSelector((s) => s.submissions);
 	const { list: years }    = useSelector((s) => s.academicYears);
-	const { list: teachers } = useSelector((s) => s.teachers);
 	const { summaries }      = useSelector((s) => s.scoring);
 
-	const [activeYear, setActiveYear] = useState(null);
+	// Purely derived from `years` - nothing else ever sets it, so it does not
+	// need to be state kept in sync by an effect.
+	const activeYear = useMemo(
+		() => years.find((y) => y.is_active) || years[0] || null,
+		[years]
+	);
 
 	useEffect(() => {
 		dispatch(fetchSubmissions());
 		dispatch(fetchYears());
 		dispatch(fetchTeachers());
 	}, [dispatch]);
-
-	useEffect(() => {
-		if (years.length && !activeYear) {
-			const active = years.find((y) => y.is_active);
-			setActiveYear(active || years[0] || null);
-		}
-	}, [years, activeYear]);
 
 	useEffect(() => {
 		if (activeYear?.id) {
@@ -162,10 +159,15 @@ export default function TeacherDashboard() {
 		[submissions, teacherId]
 	);
 
-	const approved   = mySubmissions.filter((s) => s.status === "approved");
-	const pending    = mySubmissions.filter((s) => s.status === "pending");
-	const rejected   = mySubmissions.filter((s) => s.status === "rejected");
-	const overridden = mySubmissions.filter((s) => s.status === "overridden");
+	// Memoized so they are referentially stable: `approved` feeds the pieData
+	// useMemo below, which otherwise recomputed on every single render.
+	const approved   = useMemo(() => mySubmissions.filter((s) => s.status === "approved"), [mySubmissions]);
+	const pending    = useMemo(() => mySubmissions.filter((s) => s.status === "pending"),  [mySubmissions]);
+	const rejected   = useMemo(() => mySubmissions.filter((s) => s.status === "rejected"), [mySubmissions]);
+	// The commission can change an already-approved score. That outcome had a
+	// status label but no counter, so a teacher whose points were altered saw it
+	// reflected in no total on this page -- on a screen about their own pay.
+	const overridden = useMemo(() => mySubmissions.filter((s) => s.status === "overridden"), [mySubmissions]);
 
 	// ── 1. BALL: teacherProfile.scores dan olish (to'g'ri manba) ────
 	const scores = teacherProfile?.scores || {};
@@ -177,10 +179,6 @@ export default function TeacherDashboard() {
 	// Agar scores bo'lmasa, fallback: submissionsdan hisoblash
 	const fallbackTotal = approved.reduce((a, s) => a + parseFloat(s.points || 0), 0);
 	const displayTotal  = totalPoints > 0 ? totalPoints : fallbackTotal;
-
-	const pendingTotal = pending.reduce(
-		(a, s) => a + parseFloat(s.points || s.activity_type_details?.base_points || 0), 0
-	);
 
 	// ── 2. KAFEDRA STATISTIKASI ───────────────────────────────────────
 	const myDeptId   = user?.department || teacherProfile?.department;
@@ -354,6 +352,11 @@ export default function TeacherDashboard() {
 							<p className="text-xs text-muted-foreground">
 								❌ Rad etilgan: {rejected.length}
 							</p>
+							{overridden.length > 0 && (
+								<p className="text-xs text-muted-foreground">
+									🔄 Komissiya o'zgartirdi: {overridden.length}
+								</p>
+							)}
 						</div>
 					</div>
 

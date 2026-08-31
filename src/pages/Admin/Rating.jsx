@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Trophy, Medal, Award, Search, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -32,21 +32,20 @@ export default function Rating() {
 	const { list: years } = useSelector((s) => s.academicYears);
 	const { list: departments } = useSelector((s) => s.departments);
 
-	const [selectedYear, setSelectedYear] = useState("");
+	// null = not picked yet -> fall back to the active year.
+	// "" is a real user choice here ("Barcha yillar"), so it must not be
+	// confused with "unset"; hence the null sentinel and ??.
+	const [yearChoice, setYearChoice] = useState(null);
 	const [deptFilter, setDeptFilter] = useState("all");
 	const [search, setSearch] = useState("");
+
+	const defaultYearId = years.find((y) => y.is_active)?.id || years[0]?.id || "";
+	const selectedYear = yearChoice ?? defaultYearId;
 
 	useEffect(() => {
 		dispatch(fetchYears());
 		dispatch(fetchDepartments());
 	}, [dispatch]);
-
-	useEffect(() => {
-		if (years.length && !selectedYear) {
-			const active = years.find((y) => y.is_active);
-			setSelectedYear(active?.id || years[0]?.id || "");
-		}
-	}, [years, selectedYear]);
 
 	useEffect(() => {
 		dispatch(fetchSummaries(selectedYear || undefined));
@@ -62,7 +61,7 @@ export default function Rating() {
 		.sort((a, b) => parseFloat(b.total_points || 0) - parseFloat(a.total_points || 0));
 
 	const handleYearChange = (val) => {
-		setSelectedYear(val === "all" ? "" : val);
+		setYearChoice(val === "all" ? "" : val);
 	};
 
 	return (

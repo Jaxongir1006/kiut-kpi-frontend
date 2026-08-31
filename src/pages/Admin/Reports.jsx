@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -131,8 +131,6 @@ export default function Reports() {
 	const { list: years }       = useSelector((s) => s.academicYears);
 	const { list: teachers }    = useSelector((s) => s.teachers);
 	const { list: submissions } = useSelector((s) => s.submissions);
-	const { list: types }       = useSelector((s) => s.types);
-	const { list: categories }  = useSelector((s) => s.categories);
 
 	const [yearFilter, setYearFilter] = useState("all");
 	const [isExporting, setIsExporting] = useState(false);
@@ -290,7 +288,6 @@ export default function Reports() {
 				backgroundColor: "#ffffff",
 			});
 
-			const imgData = canvas.toDataURL("image/png");
 			const pdf = new jsPDF({
 				orientation: canvas.width > canvas.height ? "l" : "p",
 				unit: "mm",
