@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Content-Security-Policy is deliberately NOT set here: it is served as a
+      response header by nginx. A meta policy would be enforced as the
+      INTERSECTION with that header, so the page could break in ways neither
+      policy explains on its own. One authority only, and it is the header.
+
+      This referrer policy is a separate control and safe to set here: reviewers
+      open teacher-supplied external links (proof_url), and the SPA path can
+      carry record ids that should not travel to a third-party site.
+    -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>kiut-kpi</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,57 @@
+# =============================================================================
+# CI — must pass before anything deploys
+# =============================================================================
+# The deploy workflow triggers on THIS workflow completing successfully, so
+# every check here is a real gate, not decoration.
+# =============================================================================
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      # `npm ci` rather than `npm install`: it installs exactly what
+      # package-lock.json pins and fails if the lockfile and package.json have
+      # drifted, so CI cannot silently test a different dependency tree than a
+      # developer has locally.
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:ci
+
+      - name: Build
+        run: npm run build
+        env:
+          # The real value is injected at deploy time. A placeholder here keeps
+          # the build honest: it proves the bundle compiles without depending on
+          # a production secret being present in CI.
+          VITE_API_URL: https://api-kpi.duckdns.org
+
+      # A dependency audit that cannot fail the build is a dependency audit
+      # nobody reads. This fails on high and critical advisories only —
+      # moderate ones in transitive dev tooling would otherwise block every PR
+      # for something not reachable at runtime.
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high

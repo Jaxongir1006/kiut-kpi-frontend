@@ -1,0 +1,119 @@
+# =============================================================================
+# Deploy the SPA to the VPS — gated on CI
+# =============================================================================
+# Builds on a GitHub runner and ships the static `dist/` output to the VPS over
+# an SSH key restricted to a forced command. That key cannot open a shell, read
+# /opt/kiutkpi/secrets, or forward a port to the loopback-bound Postgres — it
+# can only hand deploy/frontend-receiver.sh a tarball.
+#
+# Deploys the exact commit CI validated, not "main right now".
+# =============================================================================
+name: Deploy to VPS
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit SHA to deploy (must already have passed CI)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and ship to VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.event == 'push')
+
+    steps:
+      - name: Resolve the commit to deploy
+        id: target
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SHA="${{ inputs.sha }}"
+          else
+            SHA="${{ github.event.workflow_run.head_sha }}"
+          fi
+          # workflow_dispatch input is supplied by anyone who can run the
+          # workflow and is interpolated into later commands. Only a full
+          # 40-character hex SHA is acceptable.
+          if ! printf '%s' "$SHA" | grep -qE '^[0-9a-f]{40}$'; then
+            echo "::error::'$SHA' is not a full 40-character commit SHA"
+            exit 1
+          fi
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.target.outputs.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          # Baked into the bundle at build time — Vite inlines import.meta.env
+          # at compile, so this cannot be changed on the server afterwards.
+          # A wrong value here means every API call in the shipped app goes to
+          # the wrong host, and the only fix is another build.
+          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://api-kpi.duckdns.org' }}
+
+      - name: Configure SSH
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Pinned. Never StrictHostKeyChecking=no: the first connection would
+          # otherwise trust whatever answers, and what answers is decided by DNS.
+          printf '%s\n' "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Ship
+        run: |
+          set -euo pipefail
+          # No command is sent: the remote key is pinned to a forced command, so
+          # the server decides what runs and this side only supplies the bundle.
+          tar -czf - -C dist . \
+            | ssh -i ~/.ssh/deploy_key \
+                  -o BatchMode=yes \
+                  -o StrictHostKeyChecking=yes \
+                  -o ConnectTimeout=20 \
+                  -o ServerAliveInterval=30 \
+                  "${{ secrets.VPS_USER || 'root' }}@${{ secrets.VPS_HOST }}"
+
+      - name: Verify the site answers
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 6); do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 https://kiut-kpi.duckdns.org/ || echo 000)
+            if [ "$code" = "200" ]; then echo "live: HTTP $code"; exit 0; fi
+            echo "attempt $i: HTTP $code"; sleep 10
+          done
+          echo "::error::kiut-kpi.duckdns.org never returned 200 after the deploy"
+          exit 1
+
+      - name: Always remove the key from the runner
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
