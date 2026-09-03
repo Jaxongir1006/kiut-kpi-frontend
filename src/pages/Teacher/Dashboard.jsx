@@ -171,7 +171,7 @@ export default function TeacherDashboard() {
 
 	// ── 1. BALL: teacherProfile.scores dan olish (to'g'ri manba) ────
 	const scores = teacherProfile?.scores || {};
-	const totalPoints        = parseFloat(scores.total_points         || 0);
+	const totalPoints        = parseFloat(scores.final_kpi_score         || 0);
 	const academicPoints     = parseFloat(scores.academic_points      || 0);
 	const qualificationPoints= parseFloat(scores.qualification_points || 0);
 	const scientificPoints   = parseFloat(scores.scientific_points    || 0);
@@ -197,7 +197,7 @@ export default function TeacherDashboard() {
 
 		// Ularni ball bo'yicha saralab, joriy o'qituvchining reyting o'rnini topamiz
 		const sorted = [...deptSummaries].sort(
-			(a, b) => parseFloat(b.total_points || 0) - parseFloat(a.total_points || 0)
+			(a, b) => parseFloat(b.final_kpi_score || 0) - parseFloat(a.final_kpi_score || 0)
 		);
 
 		const myEmpId   = teacherProfile?.employee_id;
@@ -207,13 +207,13 @@ export default function TeacherDashboard() {
 		const myRank = myRankIdx >= 0 ? myRankIdx + 1 : null;
 
 		const avgScore = deptSummaries.length
-			? Math.round(deptSummaries.reduce((a, s) => a + parseFloat(s.total_points || 0), 0) / deptSummaries.length * 10) / 10
+			? Math.round(deptSummaries.reduce((a, s) => a + parseFloat(s.final_kpi_score || 0), 0) / deptSummaries.length * 10) / 10
 			: 0;
 
 		const topInDept = sorted.slice(0, 5).map((s) => ({
 			name:  s.teacher_details?.full_name || "—",
 			empId: s.teacher_details?.employee_id || "",
-			total: parseFloat(s.total_points || 0),
+			total: parseFloat(s.final_kpi_score || 0),
 			isMe:  s.teacher_details?.employee_id === myEmpId,
 		}));
 
@@ -229,7 +229,7 @@ export default function TeacherDashboard() {
 	const uniStats = useMemo(() => {
 		const myEmpId = teacherProfile?.employee_id;
 		const allSorted = [...summaries].sort(
-			(a, b) => parseFloat(b.total_points || 0) - parseFloat(a.total_points || 0)
+			(a, b) => parseFloat(b.final_kpi_score || 0) - parseFloat(a.final_kpi_score || 0)
 		);
 		const uniRank = allSorted.findIndex(
 			(s) => s.teacher_details?.employee_id === myEmpId

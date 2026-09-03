@@ -58,7 +58,7 @@ export default function Rating() {
 		.filter((s) =>
 			!search || s.teacher_details?.full_name?.toLowerCase().includes(search.toLowerCase())
 		)
-		.sort((a, b) => parseFloat(b.total_points || 0) - parseFloat(a.total_points || 0));
+		.sort((a, b) => parseFloat(b.final_kpi_score || 0) - parseFloat(a.final_kpi_score || 0));
 
 	const handleYearChange = (val) => {
 		setYearChoice(val === "all" ? "" : val);
@@ -133,7 +133,7 @@ export default function Rating() {
 										<h3 className="font-semibold">{name}</h3>
 										<p className="text-sm text-muted-foreground">{dept}</p>
 										<p className="text-2xl font-bold text-primary mt-2">
-											{parseFloat(item.total_points || 0).toFixed(1)}
+											{parseFloat(item.final_kpi_score || 0).toFixed(1)}
 										</p>
 										<p className="text-xs text-muted-foreground">{t("points")}</p>
 									</div>
@@ -200,7 +200,7 @@ export default function Rating() {
 												</td>
 												<td className="px-4 py-3 text-center">
 													<span className="font-bold text-primary">
-														{parseFloat(item.total_points || 0).toFixed(1)}
+														{parseFloat(item.final_kpi_score || 0).toFixed(1)}
 													</span>
 												</td>
 											</tr>

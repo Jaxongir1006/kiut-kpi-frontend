@@ -140,7 +140,7 @@ export default function Dashboard() {
 		summaries.forEach((s) => {
 			const name = s.teacher_details?.department_details?.name || "Noma'lum";
 			if (!deptMap[name]) deptMap[name] = { name, total: 0, academic: 0, scientific: 0, qualification: 0 };
-			deptMap[name].total         += parseFloat(s.total_points || 0);
+			deptMap[name].total         += parseFloat(s.final_kpi_score || 0);
 			deptMap[name].academic      += parseFloat(s.academic_points || 0);
 			deptMap[name].scientific    += parseFloat(s.scientific_points || 0);
 			deptMap[name].qualification += parseFloat(s.qualification_points || 0);
@@ -171,7 +171,7 @@ export default function Dashboard() {
 	const approvedSubs = submissions.filter((s) => s.status === "approved").length;
 	const pendingSubs  = submissions.filter((s) => s.status === "pending").length;
 	const avgScore = summaries.length
-		? Math.round(summaries.reduce((a, s) => a + parseFloat(s.total_points || 0), 0) / summaries.length)
+		? Math.round(summaries.reduce((a, s) => a + parseFloat(s.final_kpi_score || 0), 0) / summaries.length)
 		: 0;
 
 	// ── Recent activity ───────────────────────────────────────────────
@@ -221,7 +221,7 @@ export default function Dashboard() {
 					dept:     (scoreData.teacher_details?.department_details?.name)
 					          || tchrProfile?.department_details?.name
 					          || "—",
-					total:    parseFloat(scoreData.total_points    || 0),
+					total:    parseFloat(scoreData.final_kpi_score    || 0),
 					acad:     parseFloat(scoreData.academic_points || 0),
 					qual:     parseFloat(scoreData.qualification_points || 0),
 					sci:      parseFloat(scoreData.scientific_points   || 0),

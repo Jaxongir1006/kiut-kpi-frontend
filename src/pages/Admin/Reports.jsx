@@ -162,7 +162,7 @@ export default function Reports() {
 	const totalActivities = filteredSubs.length;
 	const totalApproved  = approvedSubs.length;
 	const avgScore = useMemo(() => summaries.length
-		? Math.round(summaries.reduce((a, s) => a + parseFloat(s.total_points || 0), 0) / summaries.length)
+		? Math.round(summaries.reduce((a, s) => a + parseFloat(s.final_kpi_score || 0), 0) / summaries.length)
 		: 0, [summaries]
 	);
 
@@ -187,7 +187,7 @@ export default function Reports() {
 			map[name].acad  += parseFloat(s.academic_points || 0);
 			map[name].qual  += parseFloat(s.qualification_points || 0);
 			map[name].sci   += parseFloat(s.scientific_points || 0);
-			map[name].total += parseFloat(s.total_points || 0);
+			map[name].total += parseFloat(s.final_kpi_score || 0);
 		});
 		return Object.entries(map)
 			.map(([name, v]) => ({ name, ...v, total: Math.round(v.total * 10) / 10 }))
@@ -214,11 +214,11 @@ export default function Reports() {
 	// ── 4. Top o'qituvchilar ─────────────────────────────────────────────
 	const topTeachers = useMemo(() =>
 		[...summaries]
-			.sort((a, b) => parseFloat(b.total_points || 0) - parseFloat(a.total_points || 0))
+			.sort((a, b) => parseFloat(b.final_kpi_score || 0) - parseFloat(a.final_kpi_score || 0))
 			.slice(0, 10)
 			.map(s => ({
 				name:  s.teacher_details?.full_name || "—",
-				total: parseFloat(s.total_points || 0),
+				total: parseFloat(s.final_kpi_score || 0),
 				acad:  parseFloat(s.academic_points || 0),
 				qual:  parseFloat(s.qualification_points || 0),
 				sci:   parseFloat(s.scientific_points || 0),

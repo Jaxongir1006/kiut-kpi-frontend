@@ -108,7 +108,7 @@ export default function PublicRating() {
   // ── Global stats ─────────────────────────────────────────────────────────
   const stats = useMemo(() => {
     const count = summaries.length;
-    const pts   = summaries.map((s) => parseFloat(s.total_points || 0));
+    const pts   = summaries.map((s) => parseFloat(s.final_kpi_score || 0));
     const total = pts.reduce((a, v) => a + v, 0);
     const avg   = count ? Math.round(total / count) : 0;
     const max   = count ? Math.round(Math.max(...pts)) : 0;
@@ -124,7 +124,7 @@ export default function PublicRating() {
     summaries.forEach((s) => {
       const name = s.teacher_details?.department_details?.name || "Noma'lum";
       if (!map[name]) map[name] = { name, total: 0, academic: 0, scientific: 0, qualification: 0, count: 0 };
-      map[name].total         += parseFloat(s.total_points         || 0);
+      map[name].total         += parseFloat(s.final_kpi_score         || 0);
       map[name].academic      += parseFloat(s.academic_points      || 0);
       map[name].scientific    += parseFloat(s.scientific_points    || 0);
       map[name].qualification += parseFloat(s.qualification_points || 0);
@@ -159,7 +159,7 @@ export default function PublicRating() {
     summaries.forEach((s) => {
       const name = s.teacher_details?.department_details?.name || "Noma'lum";
       if (!map[name]) map[name] = { name, total: 0, count: 0 };
-      map[name].total += parseFloat(s.total_points || 0);
+      map[name].total += parseFloat(s.final_kpi_score || 0);
       map[name].count += 1;
     });
     return Object.values(map)
@@ -170,7 +170,7 @@ export default function PublicRating() {
   // ── Top performers ────────────────────────────────────────────────────────
   const topPerformers = useMemo(() =>
     [...summaries]
-      .sort((a, b) => parseFloat(b.total_points || 0) - parseFloat(a.total_points || 0))
+      .sort((a, b) => parseFloat(b.final_kpi_score || 0) - parseFloat(a.final_kpi_score || 0))
       .slice(0, 15),
     [summaries]
   );
@@ -185,7 +185,7 @@ export default function PublicRating() {
         !search.trim() ||
         s.teacher_details?.full_name?.toLowerCase().includes(search.toLowerCase())
       )
-      .sort((a, b) => parseFloat(b.total_points || 0) - parseFloat(a.total_points || 0)),
+      .sort((a, b) => parseFloat(b.final_kpi_score || 0) - parseFloat(a.final_kpi_score || 0)),
     [summaries, deptFilter, search]
   );
 
@@ -300,7 +300,7 @@ export default function PublicRating() {
                           </div>
                           <div className="text-right shrink-0">
                             <p className="text-sm font-bold" style={{ color }}>
-                              {parseFloat(item.total_points || 0).toFixed(1)}
+                              {parseFloat(item.final_kpi_score || 0).toFixed(1)}
                             </p>
                             <p className="text-[10px] text-muted-foreground">ball</p>
                           </div>
@@ -515,7 +515,7 @@ export default function PublicRating() {
                         <h3 className={cn("font-semibold leading-snug", pos === 0 ? "text-base" : "text-sm")}>{name}</h3>
                         <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{dept}</p>
                         <p className={cn("font-bold text-primary mt-2", pos === 0 ? "text-3xl" : "text-2xl")}>
-                          {parseFloat(item.total_points || 0).toFixed(1)}
+                          {parseFloat(item.final_kpi_score || 0).toFixed(1)}
                         </p>
                         <p className="text-xs text-muted-foreground">ball</p>
                       </div>
@@ -576,7 +576,7 @@ export default function PublicRating() {
                               </td>
                               <td className="px-4 py-3 hidden md:table-cell text-muted-foreground text-sm">{dept}</td>
                               <td className="px-4 py-3 text-center font-bold text-primary">
-                                {parseFloat(item.total_points || 0).toFixed(1)}
+                                {parseFloat(item.final_kpi_score || 0).toFixed(1)}
                               </td>
                               <td className="px-4 py-3 text-center text-muted-foreground hidden lg:table-cell">
                                 {parseFloat(item.academic_points || 0).toFixed(1)}
