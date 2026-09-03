@@ -17,6 +17,13 @@ import {
 import { cn } from "@/lib/utils";
 import { fetchSummaries } from "@/features/scoring/scoringSlice";
 import { fetchDepartments } from "@/features/departments/departmentsSlice";
+import { fetchYears } from "@/features/academicYears/academicYearsSlice";
+
+// A guest receives the redacted summary (flat `full_name` / `department`);
+// a signed-in visitor receives the full one (nested `teacher_details`). The
+// page is reachable both ways, so every read goes through these two.
+const nameOf = (s) => s.full_name || s.teacher_details?.full_name || "";
+const deptOf = (s) => s.department || deptOf(s) || "";
 
 // ── Palitlari ────────────────────────────────────────────────────────────────
 const PALETTE = [
@@ -95,15 +102,23 @@ export default function PublicRating() {
   const dispatch = useDispatch();
   const { summaries, isLoading } = useSelector((s) => s.scoring);
   const { list: departments }    = useSelector((s) => s.departments);
+  const { list: years }          = useSelector((s) => s.academicYears);
+  const activeYearId = years.find((y) => y.is_active)?.id || years[0]?.id || null;
 
   const [deptFilter, setDeptFilter] = useState("all");
   const [search, setSearch]         = useState("");
   const [deptMetric, setDeptMetric] = useState("total");
 
   useEffect(() => {
-    dispatch(fetchSummaries());
+    dispatch(fetchYears());
     dispatch(fetchDepartments());
   }, [dispatch]);
+
+  // Without a year the API returns every year a signed-in visitor may see, so
+  // one person appears once per year at two different ranks.
+  useEffect(() => {
+    if (activeYearId) dispatch(fetchSummaries(activeYearId));
+  }, [dispatch, activeYearId]);
 
   // ── Global stats ─────────────────────────────────────────────────────────
   const stats = useMemo(() => {
@@ -113,7 +128,7 @@ export default function PublicRating() {
     const avg   = count ? Math.round(total / count) : 0;
     const max   = count ? Math.round(Math.max(...pts)) : 0;
     const deptSet = new Set(
-      summaries.map((s) => s.teacher_details?.department_details?.name).filter(Boolean)
+      summaries.map((s) => deptOf(s)).filter(Boolean)
     );
     return { count, avg, max, depts: deptSet.size || departments.length };
   }, [summaries, departments]);
@@ -122,7 +137,7 @@ export default function PublicRating() {
   const deptChartData = useMemo(() => {
     const map = {};
     summaries.forEach((s) => {
-      const name = s.teacher_details?.department_details?.name || "Noma'lum";
+      const name = deptOf(s) || "Noma'lum";
       if (!map[name]) map[name] = { name, total: 0, academic: 0, scientific: 0, qualification: 0, count: 0 };
       map[name].total         += parseFloat(s.final_kpi_score         || 0);
       map[name].academic      += parseFloat(s.academic_points      || 0);
@@ -157,7 +172,7 @@ export default function PublicRating() {
   const deptTableData = useMemo(() => {
     const map = {};
     summaries.forEach((s) => {
-      const name = s.teacher_details?.department_details?.name || "Noma'lum";
+      const name = deptOf(s) || "Noma'lum";
       if (!map[name]) map[name] = { name, total: 0, count: 0 };
       map[name].total += parseFloat(s.final_kpi_score || 0);
       map[name].count += 1;
@@ -179,11 +194,11 @@ export default function PublicRating() {
   const filtered = useMemo(() =>
     [...summaries]
       .filter((s) =>
-        deptFilter === "all" || s.teacher_details?.department_details?.name === deptFilter
+        deptFilter === "all" || deptOf(s) === deptFilter
       )
       .filter((s) =>
         !search.trim() ||
-        s.teacher_details?.full_name?.toLowerCase().includes(search.toLowerCase())
+        nameOf(s).toLowerCase().includes(search.toLowerCase())
       )
       .sort((a, b) => parseFloat(b.final_kpi_score || 0) - parseFloat(a.final_kpi_score || 0)),
     [summaries, deptFilter, search]
@@ -276,8 +291,8 @@ export default function PublicRating() {
                 ) : (
                   <div className="space-y-0.5 overflow-y-auto flex-1 max-h-[420px] pr-1">
                     {topPerformers.map((item, i) => {
-                      const name  = item.teacher_details?.full_name || "—";
-                      const dept  = item.teacher_details?.department_details?.name || "";
+                      const name  = nameOf(item) || "—";
+                      const dept  = deptOf(item) || "";
                       const color = seedColor(name);
                       const rankBg =
                         i === 0 ? "bg-yellow-400 text-white" :
@@ -491,8 +506,8 @@ export default function PublicRating() {
                     const item  = top3[pos];
                     if (!item) return null;
                     const Icon  = RANK_ICONS[pos];
-                    const name  = item.teacher_details?.full_name || "—";
-                    const dept  = item.teacher_details?.department_details?.name || "—";
+                    const name  = nameOf(item) || "—";
+                    const dept  = deptOf(item) || "—";
                     const color = seedColor(name);
                     return (
                       <div
@@ -546,8 +561,8 @@ export default function PublicRating() {
                       </thead>
                       <tbody>
                         {filtered.map((item, i) => {
-                          const name  = item.teacher_details?.full_name || "—";
-                          const dept  = item.teacher_details?.department_details?.name || "—";
+                          const name  = nameOf(item) || "—";
+                          const dept  = deptOf(item) || "—";
                           const color = seedColor(name);
                           return (
                             <tr key={item.id}
