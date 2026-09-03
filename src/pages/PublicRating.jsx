@@ -23,7 +23,7 @@ import { fetchYears } from "@/features/academicYears/academicYearsSlice";
 // a signed-in visitor receives the full one (nested `teacher_details`). The
 // page is reachable both ways, so every read goes through these two.
 const nameOf = (s) => s.full_name || s.teacher_details?.full_name || "";
-const deptOf = (s) => s.department || deptOf(s) || "";
+const deptOf = (s) => s.department || s.teacher_details?.department_details?.name || "";
 
 // ── Palitlari ────────────────────────────────────────────────────────────────
 const PALETTE = [
