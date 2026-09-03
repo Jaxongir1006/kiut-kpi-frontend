@@ -3,7 +3,7 @@ import {
 	LayoutDashboard, Users, FileText, Award, Settings,
 	BookOpen, GraduationCap, Calendar, FolderOpen, BarChart3,
 	CheckSquare, Globe, ChevronLeft, ChevronRight, Layers,
-	Bell, ClipboardList, TrendingUp, Plus, MessageSquare,
+	Bell, ClipboardList, TrendingUp, Plus, MessageSquare, Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
@@ -34,6 +34,7 @@ export default function Sidebar({ collapsed, onToggle }) {
 		{ label: t("dashboard"),              icon: LayoutDashboard, path: "/" },
 		{ label: "Foydalanuvchilar",          icon: Users,           path: "/users" },
 		{ label: t("activities"),             icon: FileText,        path: "/activities" },
+		{ label: "Excel orqali yuklash",      icon: Upload,          path: "/activities/import" },
 		{ label: t("review"),                 icon: CheckSquare,     path: "/review" },
 		{ label: "Apellyatsiyalar",           icon: MessageSquare,   path: "/appeals" },
 		{ label: t("rating"),                 icon: Award,           path: "/rating" },

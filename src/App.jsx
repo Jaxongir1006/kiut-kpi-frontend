@@ -20,6 +20,7 @@ import Dashboard from './pages/Admin/Dashboard';
 import Users from './pages/Admin/Users';
 import Teachers from './pages/Admin/Teachers';
 import Activities from './pages/Admin/Activities';
+import ImportActivities from './pages/Admin/ImportActivities';
 import Review from './pages/Admin/Review';
 import Rating from './pages/Admin/Rating';
 import Reports from './pages/Admin/Reports';
@@ -107,6 +108,7 @@ function AppRoutes() {
             <Route path="/users" element={<Users />} />
             <Route path="/teachers" element={<Teachers />} />
             <Route path="/activities" element={<Activities />} />
+            <Route path="/activities/import" element={<ImportActivities />} />
             <Route path="/review" element={<Review />} />
             <Route path="/appeals" element={<AdminAppeals />} />
             <Route path="/rating" element={<Rating />} />
